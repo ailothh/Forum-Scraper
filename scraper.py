@@ -4,7 +4,6 @@ import time
 import re
 from bs4 import BeautifulSoup
 # watermelon_elf Discord any errors
-# Initialize variables
 test = False
 useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 timeout = 0
@@ -54,7 +53,7 @@ def login_and_save_cookies(url, login_data):
     except Exception as e:
         print(f"Error during login: {e}")
 
-# **First Action: Save Initial Cookies**
+# Save Initial Cookies
 save_cookies(session, cookie_file)
 
 # Load cookies initially if the file exists
@@ -73,12 +72,11 @@ if not session.cookies:
 # **Explicit Call to save_cookies After Loading**
 save_cookies(session, cookie_file)
 
-# Your scraping logic starts here...
 link_pattern = r'<a\s+[^>]*?href="(https?://[^\s"]*upload[^"]*)".*?>.*?</a>'
 con = sqlite3.connect("database.db") # create database
 cur = con.cursor()
 
-# Define the scraping and processing function
+# Define scraping and processing function
 def scrape_page_and_process_links(url, session, cookie_file, cur, con):
     try:
         print(f"Fetching: {url}")
@@ -91,10 +89,8 @@ def scrape_page_and_process_links(url, session, cookie_file, cur, con):
         soup = BeautifulSoup(r.text, 'html.parser')
         
         # Extract username using the specific path
-        # Find all the table rows in the second table
+        # Find all table rows in second table
         rows = soup.select('table:nth-of-type(2) tbody tr')
-
-        # Loop through each row and get the username from the fourth td (href)
 
         # Loop through each row and get the username from the fourth td
         for row in rows:
@@ -109,10 +105,10 @@ def scrape_page_and_process_links(url, session, cookie_file, cur, con):
                 span_element = row.select_one('td:nth-of-type(4) span')
                 
                 if span_element:
-                    # If a <span> tag is found, set the username to "Anonymous"
+                    # If a <span> tag is found, set username to "Anonymous"
                     username = "Anonymous"
                 else:
-                    # If neither <a> nor <span> tag is found, set it to "Unknown"
+                    # If neither <a> nor <span> tag is found, set to "Unknown"
                     username = "Unknown"
             
             print(username)  # Or store the username in a list or process further
@@ -126,9 +122,9 @@ def scrape_page_and_process_links(url, session, cookie_file, cur, con):
                 "",
                 "",
             }:
-                continue  # Skip unwanted links
+                continue  # Skipin unwanted links
             
-            # Check if the link already exists in the database
+            # Check if link exists in the database
             cur.execute("SELECT link FROM users WHERE link=?", (link,))
             existing_link = cur.fetchone()
             if existing_link is None:  # If the link doesn't exist, process it
@@ -136,11 +132,11 @@ def scrape_page_and_process_links(url, session, cookie_file, cur, con):
                     # Fetch the link page
                     r = session.get(link)
                     
-                    # Extract content from the page
+                    # Extract content page
                     soup = BeautifulSoup(r.text, 'html.parser')
                     data = soup.get_text(strip=True)
                     
-                    # Save data to the database
+                    # Saveto database
                     print(f"username {type(username)}, link {type(link)}, data {type(data)}")
                     cur.execute("INSERT INTO users (username, link, data) VALUES (?, ?, ?)", (username, link, data))
                     con.commit()
@@ -151,7 +147,7 @@ def scrape_page_and_process_links(url, session, cookie_file, cur, con):
     except Exception as e:
         print(f"Error fetching the page {url}: {e}")
 
-# Iterate through pages
+# Iterate thru pages
 for i in range(1, 500):# replace with link
     url = f"{i}"
     scrape_page_and_process_links(url, session, cookie_file, cur, con)
