@@ -1,4 +1,4 @@
-# Website Scraping Script (Proof of Concept)
+# Proof of Concept
 #### I do not condone the use of this script on websites without authorization. This script is intended for educational and research purposes only. 
 ## Overview
 This script is designed to scrape an entire website and save the data into an SQL database for further processing. It is tailored to large-scale database sites that host forums or posts by users. The script extracts relevant information from the links, the data associated with them, and the username of the poster, along with the post titles.
